@@ -8,7 +8,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 
-import com.mathildeguillossou.weathersensor.api.ApiClassInterface;
 import com.mathildeguillossou.weathersensor.R;
 import com.mathildeguillossou.weathersensor.api.ApiManager;
 import com.mathildeguillossou.weathersensor.bean.Weather;
@@ -16,9 +15,16 @@ import com.mathildeguillossou.weathersensor.bean.Weather;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements ApiClassInterface.ApiListInterface {
+import rx.Observer;
+import rx.Subscription;
+import rx.android.observables.AndroidObservable;
+import rx.subscriptions.Subscriptions;
+
+
+public class MainActivity extends AppCompatActivity implements Observer<List<Weather>> {
 
     private List<Weather> mWeatherList;
+    private Subscription mSubscription= Subscriptions.empty();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements ApiClassInterface
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        mWeatherList = new ArrayList<>();
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -36,23 +43,31 @@ public class MainActivity extends AppCompatActivity implements ApiClassInterface
             }
         });
 
-        getWeathers();
-    }
-
-    private void getWeathers() {
-        ApiManager apiManager = new ApiManager(this);
-        apiManager.loadW();
-    }
-
-    @Override
-    public void success(List<?> list) {
-        mWeatherList = new ArrayList<>();
-        mWeatherList = (List<Weather>) list;
-        Log.d("success", mWeatherList.toString());
+        mSubscription =
+                AndroidObservable
+                        .fromActivity(this, ApiManager.loadW())
+                        .subscribe(this);
     }
 
     @Override
-    public void fail() {
+    protected void onDestroy() {
+        mSubscription.unsubscribe();
+        super.onDestroy();
+    }
 
+    @Override
+    public void onCompleted() {
+
+    }
+
+    @Override
+    public void onError(Throwable e) {
+
+    }
+
+    @Override
+    public void onNext(List<Weather> args) {
+        Log.d("Observer", "onNext " + args.toString());
+        mWeatherList = args;
     }
 }
