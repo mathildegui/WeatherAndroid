@@ -10,7 +10,7 @@ import android.view.View;
 
 import com.mathildeguillossou.weathersensor.R;
 import com.mathildeguillossou.weathersensor.bean.Weather;
-import com.mathildeguillossou.weathersensor.fragment.ChartFragment;
+import com.mathildeguillossou.weathersensor.fragment.MainFragment;
 import com.mathildeguillossou.weathersensor.fragment.WeatherListFragment;
 
 public class MainActivity extends AppCompatActivity implements WeatherListFragment.OnListFragmentInteractionListener {
@@ -25,7 +25,8 @@ public class MainActivity extends AppCompatActivity implements WeatherListFragme
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     //.add(R.id.frag, new WeatherListFragment())
-                    .add(R.id.frag, new ChartFragment())
+                    //.add(R.id.frag, new ChartFragment())
+                    .add(R.id.frag, new MainFragment())
                     .commit();
         }
 

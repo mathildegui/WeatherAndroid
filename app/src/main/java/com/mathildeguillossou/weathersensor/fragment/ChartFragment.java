@@ -20,7 +20,6 @@ import java.util.ArrayList;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link ChartFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link ChartFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -56,7 +55,7 @@ public class ChartFragment extends Fragment {
 
     private void setData(int count, float range, LineChart chart) {
 
-        ArrayList<String> xVals = new ArrayList<String>();
+        /*ArrayList<String> xVals = new ArrayList<String>();
         for (int i = 0; i < count; i++) {
             xVals.add((i) + "");
         }
@@ -99,7 +98,7 @@ public class ChartFragment extends Fragment {
         LineData data = new LineData(xVals, dataSets);
 
         // set data
-        chart.setData(data);
+        chart.setData(data);*/
     }
 
     @Override

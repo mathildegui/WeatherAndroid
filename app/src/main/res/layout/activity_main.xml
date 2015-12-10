@@ -21,17 +21,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <!--<fragment
-        android:id="@+id/frag"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:name="com.mathildeguillossou.weathersensor.fragment.WeatherListFragment"
-        tools:layout="@layout/fragment_weather_list" />
--->
-    <!--<include
-        android:id="@+id/content_main"
-        layout="@layout/content_main" />-->
-
     <RelativeLayout
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:id="@+id/frag"
