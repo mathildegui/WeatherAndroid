@@ -1,9 +1,8 @@
 package com.mathildeguillossou.weathersensor.fragment;
 
 
+import android.app.Fragment;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +31,8 @@ public class MainFragment extends Fragment implements Observer<List<Weather>> {
     @Bind(R.id.currentTemp) TextView mCurrentTemp;
     @Bind(R.id.currentHumidity) TextView mCurrentHumidity;
 
+    TextView mCurrentT;
+
     private Weather mWeather;
     private Subscription mSubscription = Subscriptions.empty();
 
@@ -47,6 +48,8 @@ public class MainFragment extends Fragment implements Observer<List<Weather>> {
 
         ButterKnife.bind(this, v);
 
+        mCurrentT = (TextView)v.findViewById(R.id.currentTemp);
+
         /**
          * FIXME load only the last value and not the entire list of data
          */
@@ -57,6 +60,7 @@ public class MainFragment extends Fragment implements Observer<List<Weather>> {
                         .subscribeOn(AndroidSchedulers.mainThread())
                         .subscribe(this);
 
+        mCurrentT.setText(String.valueOf("value"));
         return v;
     }
 
@@ -79,11 +83,22 @@ public class MainFragment extends Fragment implements Observer<List<Weather>> {
     @Override
     public void onNext(List<Weather> args) {
         mWeather = args.get(args.size() - 1);
-        updateData();
+        new ReceiverThread().run();
     }
 
-    private void updateData() {
-        mCurrentTemp.setText(String.valueOf(mWeather.temperature));
-        mCurrentHumidity.setText(String.valueOf(mWeather.humidity));
+    /**
+     * Because only the original thread that created a view hierarchy can touch its views
+     */
+    private class ReceiverThread extends Thread {
+        @Override
+        public void run() {
+            MainFragment.this.getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mCurrentTemp.setText(String.valueOf(mWeather.temperature));
+                    mCurrentHumidity.setText(String.valueOf(mWeather.humidity));
+                }
+            });
+        }
     }
 }
