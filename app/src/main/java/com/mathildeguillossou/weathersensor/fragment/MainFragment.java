@@ -3,17 +3,20 @@ package com.mathildeguillossou.weathersensor.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.mathildeguillossou.weathersensor.R;
 import com.mathildeguillossou.weathersensor.api.ApiManager;
 import com.mathildeguillossou.weathersensor.bean.Weather;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import rx.Observer;
 import rx.Subscription;
 import rx.android.concurrency.AndroidSchedulers;
@@ -26,6 +29,9 @@ import rx.subscriptions.Subscriptions;
  */
 public class MainFragment extends Fragment implements Observer<List<Weather>> {
 
+    @Bind(R.id.currentTemp) TextView mCurrentTemp;
+    @Bind(R.id.currentHumidity) TextView mCurrentHumidity;
+
     private Weather mWeather;
     private Subscription mSubscription = Subscriptions.empty();
 
@@ -37,8 +43,9 @@ public class MainFragment extends Fragment implements Observer<List<Weather>> {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_main, container, false);
+
+        ButterKnife.bind(this, v);
 
         /**
          * FIXME load only the last value and not the entire list of data
@@ -72,9 +79,11 @@ public class MainFragment extends Fragment implements Observer<List<Weather>> {
     @Override
     public void onNext(List<Weather> args) {
         mWeather = args.get(args.size() - 1);
+        updateData();
     }
 
     private void updateData() {
-
+        mCurrentTemp.setText(String.valueOf(mWeather.temperature));
+        mCurrentHumidity.setText(String.valueOf(mWeather.humidity));
     }
 }

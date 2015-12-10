@@ -23,9 +23,9 @@ import rx.subscriptions.Subscriptions;
  */
 public class ApiManager {
     public final static String TAG     = "ApiManager";
-    //TODO: change to ip box (currently not working on BBox)
-    public static final String API_URL = "http://192.168.1.30:3000/";
-    //public static final String API_URL = "http://89.92.39.60:3000/";
+    //FIXME change to ip box (currently not working on BBox)
+    //public static final String API_URL = "http://192.168.1.30:3000/";
+    public static final String API_URL = "http://81.220.90.238:3000/";
 
     static Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(API_URL)
