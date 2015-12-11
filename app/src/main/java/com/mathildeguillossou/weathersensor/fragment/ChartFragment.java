@@ -1,21 +1,13 @@
 package com.mathildeguillossou.weathersensor.fragment;
 
-import android.content.Context;
-import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
 import com.mathildeguillossou.weathersensor.R;
-
-import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.

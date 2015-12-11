@@ -1,6 +1,9 @@
 package com.mathildeguillossou.weathersensor.activity;
 
 
+import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -10,6 +13,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.mathildeguillossou.weathersensor.R;
@@ -23,21 +27,68 @@ public class MainActivity extends AppCompatActivity implements
 
     private Toolbar mToolbar;
     private DrawerLayout mDrawerLayout;
+    private NavigationView mNavigationView;
+    private FragmentManager mFragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mFragmentManager = getSupportFragmentManager();
+
         setupToolbar();
         setupFrag(savedInstanceState);
         setupDrawer();
         setupFloatingButton();
+        setDrawerContent();
+    }
+
+    private void setDrawerContent() {
+        mNavigationView = (NavigationView) findViewById(R.id.nvView);
+        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem item) {
+                selectDrawerItem(item);
+                return true;
+            }
+        });
+    }
+
+    private void selectDrawerItem(MenuItem item) {
+        Fragment f = null;
+        Class fragClas;
+
+        switch (item.getItemId()) {
+            case R.id.nav_chart_fragment:
+                fragClas = ChartFragment.class;
+                break;
+            case R.id.nav_list_fragment:
+                fragClas = WeatherListFragment.class;
+                break;
+            default:
+                fragClas = MainFragment.class;
+        }
+
+        try {
+            f = (Fragment) fragClas.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        mFragmentManager
+                .beginTransaction()
+                .replace(R.id.content_frame, f)
+                .commit();
+
+        item.setChecked(true);
+        setTitle(item.getTitle());
+        mDrawerLayout.closeDrawers();
     }
 
     private void setupFrag(Bundle b) {
         if(b == null) {
-            getFragmentManager()
+            mFragmentManager
                     .beginTransaction()
                     .addToBackStack(MainFragment.class.getSimpleName())
                     .add(R.id.content_frame, new MainFragment())
@@ -102,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.chart:
-                getFragmentManager()
+                mFragmentManager
                         .beginTransaction()
                         .addToBackStack(MainFragment.class.getSimpleName())
                         .replace(R.id.content_frame, ChartFragment.newInstance())
