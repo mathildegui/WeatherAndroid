@@ -8,13 +8,13 @@
         android:id="@+id/list"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_margin="30dp"
         android:text="Liste"/>
     <TextView
         android:id="@+id/chart"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_margin="30dp"
         android:text="Graphique"/>
 
     <!-- The navigation drawer -->
