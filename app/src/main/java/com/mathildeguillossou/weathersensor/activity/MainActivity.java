@@ -15,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.mathildeguillossou.weathersensor.R;
 import com.mathildeguillossou.weathersensor.bean.Weather;
@@ -22,13 +23,23 @@ import com.mathildeguillossou.weathersensor.fragment.ChartFragment;
 import com.mathildeguillossou.weathersensor.fragment.MainFragment;
 import com.mathildeguillossou.weathersensor.fragment.WeatherListFragment;
 
+import java.util.Calendar;
+
 public class MainActivity extends AppCompatActivity implements
-        WeatherListFragment.OnListFragmentInteractionListener, View.OnClickListener {
+        WeatherListFragment.OnListFragmentInteractionListener {
 
     private Toolbar mToolbar;
     private DrawerLayout mDrawerLayout;
-    private NavigationView mNavigationView;
     private FragmentManager mFragmentManager;
+
+    private final static String DAY, DAWN, NIGHT, EVENING;
+
+    static {
+        DAY     = "day";
+        DAWN    = "dawn";
+        NIGHT   = "night";
+        EVENING = "evening";
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,14 +56,46 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void setDrawerContent() {
-        mNavigationView = (NavigationView) findViewById(R.id.nvView);
-        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nvView);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
                 selectDrawerItem(item);
                 return true;
             }
         });
+
+        ImageView ivHeader = (ImageView)navigationView.getHeaderView(0).findViewById(R.id.nav_header);
+        int resourceId = getResources().getIdentifier("rockymontains_"+getTime(), "drawable", getPackageName());
+
+        ivHeader.setBackgroundResource(resourceId);
+    }
+
+    /**
+     * Return the moment of the day
+     * Possible values: NIGHT - DAWN - DAY - EVENING
+     * @return Moment of the day
+     */
+    private String getTime() {
+        Calendar c = Calendar.getInstance();
+        int hour = c.get(Calendar.HOUR_OF_DAY);
+
+        if(hour >= 22 || hour < 4) {
+            Log.d("hour", "night " + hour);
+            return NIGHT;
+        } else if (hour >= 4 && hour < 10) {
+            Log.d("hour", "DAWN " + hour);
+            return DAWN;
+        } else if (hour >= 10 && hour < 16) {
+            Log.d("hour", "DAY " + hour);
+            return DAY;
+        } else if (hour >= 16 && hour < 22) {
+            Log.d("hour", "EVENING " + hour);
+            return EVENING;
+        } else {
+            Log.d("BONJOUR", "EVENING " + hour);
+        }
+        return DAY;
     }
 
     private void selectDrawerItem(MenuItem item) {
@@ -118,11 +161,13 @@ public class MainActivity extends AppCompatActivity implements
                 R.string.drawer_close) {
             public void onDrawerClosed(View view) {
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+                Log.d("on Drawer", "closed");
             }
 
             public void onDrawerOpened(View drawerView) {
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
                 mDrawerLayout.bringToFront();
+                Log.d("on Drawer", "opened");
             }
 
             public void onDrawerSlide(View drawerView, float slideOffset) {
@@ -147,19 +192,5 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onListFragmentInteraction(Weather item) {
         Log.d("onFragment Interaction", "from the act");
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.chart:
-                mFragmentManager
-                        .beginTransaction()
-                        .addToBackStack(MainFragment.class.getSimpleName())
-                        .replace(R.id.content_frame, ChartFragment.newInstance())
-                        .commit();
-                mDrawerLayout.closeDrawers();
-                break;
-        }
     }
 }

@@ -11,9 +11,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/colorAccent"
-        android:textSize="40dp"
+        android:textSize="40sp"
         android:layout_marginTop="20dp"
-        android:text="Votre maison"/>
+        android:text="@string/house"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:textColor="@color/colorPrimary"
             android:textStyle="bold"
-            android:textSize="70dp"
+            android:textSize="70sp"
              />
 
         <TextView
@@ -35,8 +35,8 @@
             android:layout_height="wrap_content"
             android:textColor="@color/colorPrimary"
             android:textStyle="bold"
-            android:textSize="70dp"
-            android:text="°C" />
+            android:textSize="70sp"
+            android:text="@string/degree" />
     </LinearLayout>
 
     <TextView
@@ -44,8 +44,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/colorAccent"
-        android:textSize="30dp"
-        android:text="Température"
+        android:textSize="30sp"
+        android:text="@string/temperature"
         />
 
     <LinearLayout
@@ -60,14 +60,14 @@
             android:layout_height="wrap_content"
             android:textColor="@color/colorPrimary"
             android:textStyle="bold"
-            android:textSize="70dp" />
+            android:textSize="70sp" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/colorPrimary"
             android:textStyle="bold"
-            android:textSize="70dp"
-            android:text="%" />
+            android:textSize="70sp"
+            android:text="@string/percent" />
     </LinearLayout>
 
     <TextView
@@ -75,8 +75,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/colorAccent"
-        android:textSize="30dp"
-        android:text="Humidité"
+        android:textSize="30sp"
+        android:text="@string/humidity"
         />
 
 </LinearLayout>

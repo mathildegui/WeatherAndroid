@@ -1,17 +1,20 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="192dp"
-    android:background="?attr/colorPrimaryDark"
-    android:padding="16dp"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark"
-    android:orientation="vertical"
-    android:gravity="bottom">
-
-    <TextView
+    android:layout_height="180dp"
+    android:orientation="vertical">
+    <ImageView
+        android:id="@+id/nav_header"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/nav_header_bg"
+        android:scaleType="centerCrop"
+        android:contentDescription="@string/drawer_bg_desc" />
+    <!--<TextView
+        style="@style/TextAppearance.AppCompat.Subhead"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Header"
-        android:textColor="@android:color/white"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
-
-</LinearLayout>
+        android:layout_gravity="bottom"
+        android:layout_margin="16dp"
+        android:text="Your Name Here"
+        android:textColor="@android:color/white" />-->
+</FrameLayout>
