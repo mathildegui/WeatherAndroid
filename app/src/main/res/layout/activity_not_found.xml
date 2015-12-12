@@ -1,21 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-<ImageView
+<com.nirhart.parallaxscroll.views.ParallaxScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="200dp"
-    android:src="@drawable/not_found"
-    android:scaleType="fitXY"
-    android:adjustViewBounds="true"
-    android:alpha="0.8" />
-
-    <TextView
+    android:layout_height="match_parent"
+    app:parallax_factor="1.9">
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="La Peugeot 404 est une automobile de la marque Peugeot produite à partir de mai 1960. Ce sera, en mai 1962, la première berline française de série (tout comme le premier coupé/cabriolet) équipée d'un moteur à injection.
+        android:layout_height="wrap_content"
+        android:background="@android:color/white" >
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:src="@drawable/not_found"
+            android:scaleType="fitXY"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/description_peugeot" />
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/white" >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/bref"
+                android:layout_margin="10dp"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:textColor="@color/colorPrimary"/>
 
-La 404 a été retirée du catalogue français en octobre 1975, à l'exception de la camionnette qui fut commercialisée en France jusqu'en 1979. La production s'est prolongée pendant plusieurs années à l'étranger : les dernières 404 étaient des utilitaires assemblés en 19891 à l'usine de Mombassa (Kenya).
+            <TextView
+                android:id="@+id/main_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp" />
 
-De 1960 à 1975, 2 885 377 exemplaires (toutes versions confondues) sont sortis des chaînes de montage, dont 1 672 395 berlines."/>
-</LinearLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/history"
+                android:layout_margin="10dp"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:textColor="@color/colorPrimary"/>
+
+            <TextView
+                android:id="@+id/history"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"/>
+        </LinearLayout>
+    </LinearLayout>
+</com.nirhart.parallaxscroll.views.ParallaxScrollView>

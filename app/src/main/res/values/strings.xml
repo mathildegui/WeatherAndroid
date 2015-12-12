@@ -15,4 +15,8 @@
     <string name="percent">%</string>
     <string name="humidity">Humidité</string>
     <string name="drawer_bg_desc">Drawer header background</string>
+    <string name="bref">En Bref</string>
+    <string name="history">Histoire</string>
+    <string name="specifications">Caractéristiques</string>
+    <string name="description_peugeot">peugeot photo</string>
 </resources>

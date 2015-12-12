@@ -39,4 +39,5 @@ dependencies {
     compile 'com.squareup.retrofit:converter-gson:2.0.0-beta2'
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.github.PhilJay:MPAndroidChart:v2.1.6'
+    compile 'com.github.nirhart:parallaxscroll:1.0'
 }
