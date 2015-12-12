@@ -13,35 +13,20 @@ import com.mathildeguillossou.weathersensor.R;
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
  * to handle interaction events.
- * Use the {@link ChartFragment#newInstance} factory method to
- * create an instance of this fragment.
  */
 public class ChartFragment extends Fragment {
 
     //private OnFragmentInteractionListener mListener;
 
     public ChartFragment() {
-        // Required empty public constructor
-    }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment ChartFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ChartFragment newInstance() {
-        ChartFragment fragment = new ChartFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
+
         }
     }
 

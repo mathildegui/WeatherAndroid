@@ -37,7 +37,7 @@ public class MainFragment extends Fragment implements Observer<List<Weather>> {
     private Subscription mSubscription = Subscriptions.empty();
 
     public MainFragment() {
-        // Required empty public constructor
+
     }
 
 

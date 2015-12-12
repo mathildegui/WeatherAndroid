@@ -1,6 +1,7 @@
 package com.mathildeguillossou.weathersensor.activity;
 
 
+import android.content.Intent;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -22,15 +23,20 @@ import com.mathildeguillossou.weathersensor.bean.Weather;
 import com.mathildeguillossou.weathersensor.fragment.ChartFragment;
 import com.mathildeguillossou.weathersensor.fragment.MainFragment;
 import com.mathildeguillossou.weathersensor.fragment.WeatherListFragment;
+import com.mathildeguillossou.weathersensor.utils.Connection;
 
 import java.util.Calendar;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity implements
         WeatherListFragment.OnListFragmentInteractionListener {
 
-    private Toolbar mToolbar;
-    private DrawerLayout mDrawerLayout;
     private FragmentManager mFragmentManager;
+
+    @Bind(R.id.toolbar) Toolbar mToolbar;
+    @Bind(R.id.drawer_layout) DrawerLayout mDrawerLayout;
 
     private final static String DAY, DAWN, NIGHT, EVENING;
 
@@ -44,14 +50,35 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+
+
+        //Require the ACCESS_NETWORK_STATE permission
+        boolean isConnected = Connection.checkActiveNetwork(getApplicationContext());
 
         mFragmentManager = getSupportFragmentManager();
 
+        if(!isConnected) {
+            setContentView(R.layout.no_network);
+            //Toast.makeText(this, Connection.getErrorMessage(), Toast.LENGTH_SHORT).show();
+            findViewById(R.id.not_found).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(MainActivity.this, NotFoundActivity.class));
+                }
+            });
+        } else {
+            setContentView(R.layout.activity_main);
+
+            setupFrag(savedInstanceState);
+            setupFloatingButton();
+        }
+        initApp();
+    }
+
+    private void initApp() {
+        ButterKnife.bind(this);
         setupToolbar();
-        setupFrag(savedInstanceState);
         setupDrawer();
-        setupFloatingButton();
         setDrawerContent();
     }
 
@@ -66,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         ImageView ivHeader = (ImageView)navigationView.getHeaderView(0).findViewById(R.id.nav_header);
-        int resourceId = getResources().getIdentifier("rockymontains_"+getTime(), "drawable", getPackageName());
+        int resourceId = getResources().getIdentifier("rockymontains_" + getTime(), "drawable", getPackageName());
 
         ivHeader.setBackgroundResource(resourceId);
     }
@@ -81,19 +108,13 @@ public class MainActivity extends AppCompatActivity implements
         int hour = c.get(Calendar.HOUR_OF_DAY);
 
         if(hour >= 22 || hour < 4) {
-            Log.d("hour", "night " + hour);
             return NIGHT;
         } else if (hour >= 4 && hour < 10) {
-            Log.d("hour", "DAWN " + hour);
             return DAWN;
         } else if (hour >= 10 && hour < 16) {
-            Log.d("hour", "DAY " + hour);
             return DAY;
         } else if (hour >= 16 && hour < 22) {
-            Log.d("hour", "EVENING " + hour);
             return EVENING;
-        } else {
-            Log.d("BONJOUR", "EVENING " + hour);
         }
         return DAY;
     }
@@ -151,8 +172,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void setupDrawer() {
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-
         ActionBarDrawerToggle abToggle = new ActionBarDrawerToggle(
                 this,
                 mDrawerLayout,
@@ -178,7 +197,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void setupToolbar() {
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
         if(mToolbar != null)
             setSupportActionBar(mToolbar);
 
