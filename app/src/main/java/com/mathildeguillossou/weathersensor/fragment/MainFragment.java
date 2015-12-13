@@ -11,6 +11,8 @@ import android.widget.TextView;
 import com.mathildeguillossou.weathersensor.R;
 import com.mathildeguillossou.weathersensor.api.ApiManager;
 import com.mathildeguillossou.weathersensor.bean.Weather;
+import com.mathildeguillossou.weathersensor.utils.*;
+import com.mathildeguillossou.weathersensor.utils.Number;
 
 import java.util.List;
 
@@ -26,20 +28,17 @@ import rx.subscriptions.Subscriptions;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MainFragment extends Fragment implements Observer<List<Weather>> {
+public class MainFragment extends Fragment implements Observer<Weather> {
 
     @Bind(R.id.currentTemp) TextView mCurrentTemp;
     @Bind(R.id.currentHumidity) TextView mCurrentHumidity;
 
-    TextView mCurrentT;
-
     private Weather mWeather;
-    private Subscription mSubscription = Subscriptions.empty();
+    private Subscription mSubsGetLast = Subscriptions.empty();
 
     public MainFragment() {
 
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -48,25 +47,21 @@ public class MainFragment extends Fragment implements Observer<List<Weather>> {
 
         ButterKnife.bind(this, v);
 
-        mCurrentT = (TextView)v.findViewById(R.id.currentTemp);
-
         /**
          * FIXME load only the last value and not the entire list of data
          */
-        mSubscription =
+        mSubsGetLast =
                 AndroidObservable
-                        .fromFragment(this, ApiManager.loadW())
+                        .fromFragment(this, ApiManager.getLast())
                         .observeOn(Schedulers.threadPoolForIO())
                         .subscribeOn(AndroidSchedulers.mainThread())
                         .subscribe(this);
-
-        mCurrentT.setText(String.valueOf("value"));
         return v;
     }
 
     @Override
     public void onDestroy() {
-        mSubscription.unsubscribe();
+        mSubsGetLast.unsubscribe();
         super.onDestroy();
     }
 
@@ -81,8 +76,8 @@ public class MainFragment extends Fragment implements Observer<List<Weather>> {
     }
 
     @Override
-    public void onNext(List<Weather> args) {
-        mWeather = args.get(args.size() - 1);
+    public void onNext(Weather args) {
+        mWeather = args;
         new ReceiverThread().run();
     }
 
@@ -95,8 +90,14 @@ public class MainFragment extends Fragment implements Observer<List<Weather>> {
             MainFragment.this.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mCurrentTemp.setText(String.valueOf(mWeather.temperature));
-                    mCurrentHumidity.setText(String.valueOf(mWeather.humidity));
+                    String t = Number.isNullDecimal(mWeather.temperature)?
+                            String.valueOf(mWeather.temperature):
+                            String.format("%.2f", mWeather.temperature);
+                            mCurrentTemp.setText(t);
+                    String h = Number.isNullDecimal(mWeather.humidity)?
+                            String.valueOf(mWeather.humidity):
+                            String.format("%.2f", mWeather.humidity);
+                    mCurrentHumidity.setText(h);
                 }
             });
         }

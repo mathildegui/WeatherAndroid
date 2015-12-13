@@ -19,4 +19,6 @@
     <string name="history">Histoire</string>
     <string name="specifications">Caractéristiques</string>
     <string name="description_peugeot">peugeot photo</string>
+    <string name="add">ajouter</string>
+    <string name="cancel">annuler</string>
 </resources>

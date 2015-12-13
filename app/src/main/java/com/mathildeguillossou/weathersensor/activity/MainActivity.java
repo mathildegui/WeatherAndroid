@@ -3,12 +3,12 @@ package com.mathildeguillossou.weathersensor.activity;
 
 import android.content.Intent;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -19,19 +19,27 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.mathildeguillossou.weathersensor.R;
+import com.mathildeguillossou.weathersensor.api.ApiManager;
 import com.mathildeguillossou.weathersensor.bean.Weather;
 import com.mathildeguillossou.weathersensor.fragment.ChartFragment;
 import com.mathildeguillossou.weathersensor.fragment.MainFragment;
 import com.mathildeguillossou.weathersensor.fragment.WeatherListFragment;
+import com.mathildeguillossou.weathersensor.fragment.dialog.DialogAddFragment;
 import com.mathildeguillossou.weathersensor.utils.Connection;
 
 import java.util.Calendar;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import rx.Observer;
+import rx.Subscription;
+import rx.android.concurrency.AndroidSchedulers;
+import rx.android.observables.AndroidObservable;
+import rx.concurrency.Schedulers;
+import rx.subscriptions.Subscriptions;
 
-public class MainActivity extends AppCompatActivity implements
-        WeatherListFragment.OnListFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements DialogAddFragment.DialogListener,
+        WeatherListFragment.OnListFragmentInteractionListener, Observer<Weather> {
 
     private FragmentManager mFragmentManager;
 
@@ -159,12 +167,14 @@ public class MainActivity extends AppCompatActivity implements
                     .commit();
         }
     }
-
+    private Subscription mSubAdd = Subscriptions.empty();
     private void setupFloatingButton() {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                DialogFragment newFragment = new DialogAddFragment();
+                newFragment.show(getSupportFragmentManager(), "Add value");
                 /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();*/
             }
@@ -210,5 +220,36 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onListFragmentInteraction(Weather item) {
         Log.d("onFragment Interaction", "from the act");
+    }
+
+    @Override
+    public void onDialogPositiveClick(Float humidity, Float temperature) {
+        Weather w = new Weather(humidity, temperature);
+        mSubAdd =
+                AndroidObservable
+                        .fromActivity(MainActivity.this, ApiManager.addW(w))
+                        .observeOn(Schedulers.threadPoolForIO())
+                        .subscribeOn(AndroidSchedulers.mainThread())
+                        .subscribe(this);
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+        dialog.dismiss();
+    }
+
+    @Override
+    public void onCompleted() {
+        Log.d("on", "completed");
+    }
+
+    @Override
+    public void onError(Throwable e) {
+        Log.d("on", "erro");
+    }
+
+    @Override
+    public void onNext(Weather args) {
+        Log.d("on", "next");
     }
 }

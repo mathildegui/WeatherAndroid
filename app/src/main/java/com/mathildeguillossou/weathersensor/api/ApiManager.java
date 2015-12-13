@@ -11,7 +11,9 @@ import retrofit.Callback;
 import retrofit.GsonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
+import retrofit.http.Body;
 import retrofit.http.GET;
+import retrofit.http.POST;
 import rx.Observable;
 import rx.Observer;
 import rx.Subscription;
@@ -36,6 +38,65 @@ public class ApiManager {
     private interface ApiManagerService {
         @GET("/weathers")
         Call<List<Weather>> getWeathers();
+
+        @GET("/weathers/last")
+        Call<Weather> getLast();
+
+        @POST("/weathers")
+        Call<Weather> postWeather(@Body Weather w);
+    }
+
+    public static Observable<Weather> addW(final Weather w) {
+        return Observable.create(new Observable.OnSubscribeFunc<Weather>() {
+
+            @Override
+            public Subscription onSubscribe(Observer<? super Weather> obs) {
+                final Observer<? super Weather> o = obs;
+                Call<Weather> call = apiManagerServiceInterface.postWeather(w);
+                call.enqueue(new Callback<Weather>() {
+                    @Override
+                    public void onResponse(Response<Weather> response, Retrofit retrofit) {
+                        Weather w = response.body();
+                        //Log.d("onResponse", w.toString());
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+                        Log.d("onFailure", t.toString());
+                    }
+                });
+                return Subscriptions.empty();
+            }
+        }).subscribeOn(Schedulers.threadPoolForIO());
+    }
+
+    public static Observable<Weather> getLast() {
+        return Observable.create(new Observable.OnSubscribeFunc<Weather>() {
+
+            @Override
+            public Subscription onSubscribe(Observer<? super Weather> obs) {
+                final Observer<? super Weather> o = obs;
+                Call<Weather> call = apiManagerServiceInterface.getLast();
+                call.enqueue(new Callback<Weather>() {
+                    @Override
+                    public void onResponse(Response<Weather> response, Retrofit retrofit) {
+                        Weather w = response.body();
+                        try {
+                            o.onNext(w);
+                            o.onCompleted();
+                        } catch (Exception e) {
+                            o.onError(e);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+                        Log.d("onFailure", t.toString());
+                    }
+                });
+                return Subscriptions.empty();
+            }
+        }).subscribeOn(Schedulers.threadPoolForIO());
     }
 
     public static Observable<List<Weather>> loadW() {
