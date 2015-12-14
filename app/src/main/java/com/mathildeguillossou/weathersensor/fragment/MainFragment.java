@@ -1,12 +1,12 @@
 package com.mathildeguillossou.weathersensor.fragment;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -32,11 +32,8 @@ public class MainFragment extends Fragment implements Observer<Weather> {
 
     @Bind(R.id.currentTemp) TextView mCurrentTemp;
     @Bind(R.id.currentHumidity) TextView mCurrentHumidity;
-
     @Bind(R.id.swipeContainer) SwipeRefreshLayout swipeContainer;
 
-
-    private Weather mWeather;
     private Subscription mSubsGetLast = Subscriptions.empty();
 
     public MainFragment() {
@@ -105,29 +102,41 @@ public class MainFragment extends Fragment implements Observer<Weather> {
     }
 
     @Override
-    public void onNext(Weather args) {
-        mWeather = args;
-        new ReceiverThread().run();
+    public void onNext(Weather w) {
+        updateFields(w.temperature, w.humidity);
+    }
+
+    public void updateFields(float temp, float hum) {
+        new ReceiverThread(temp, hum).run();
     }
 
     /**
      * Because only the original thread that created a view hierarchy can touch its views
      */
-    private class ReceiverThread extends Thread {
+    public class ReceiverThread extends Thread {
+
+        private float hum;
+        private float temp;
+
+        public ReceiverThread(float temp, float hum) {
+            this.hum  = hum;
+            this.temp = temp;
+        }
+
         @Override
         public void run() {
             MainFragment.this.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    String t = Number.isNullDecimal(mWeather.temperature)?
-                            String.valueOf(mWeather.temperature):
-                            String.format("%.2f", mWeather.temperature);
-                            mCurrentTemp.setText(t);
-                    String h = Number.isNullDecimal(mWeather.humidity)?
-                            String.valueOf(mWeather.humidity):
-                            String.format("%.2f", mWeather.humidity);
+                    String t = Number.isNullDecimal(temp)?
+                            String.valueOf(temp):
+                            String.format("%.2f", temp);
+                    mCurrentTemp.setText(t);
+                    String h = Number.isNullDecimal(hum)?
+                            String.valueOf(hum):
+                            String.format("%.2f", hum);
                     mCurrentHumidity.setText(h);
-                    swipeContainer.setRefreshing(false);
+                    if(swipeContainer != null) swipeContainer.setRefreshing(false);
                 }
             });
         }

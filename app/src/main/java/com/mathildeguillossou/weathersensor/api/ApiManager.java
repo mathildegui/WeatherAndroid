@@ -1,7 +1,5 @@
 package com.mathildeguillossou.weathersensor.api;
 
-import android.util.Log;
-
 import com.mathildeguillossou.weathersensor.bean.Weather;
 
 import java.util.List;
@@ -57,12 +55,18 @@ public class ApiManager {
                     @Override
                     public void onResponse(Response<Weather> response, Retrofit retrofit) {
                         Weather w = response.body();
-                        //Log.d("onResponse", w.toString());
+                        try {
+                            o.onNext(w);
+                            o.onCompleted();
+                        } catch (Exception e) {
+                            o.onError(e);
+                        }
                     }
 
                     @Override
                     public void onFailure(Throwable t) {
-                        Log.d("onFailure", t.toString());
+                        t.printStackTrace();
+                        o.onError(t);
                     }
                 });
                 return Subscriptions.empty();
@@ -91,7 +95,8 @@ public class ApiManager {
 
                     @Override
                     public void onFailure(Throwable t) {
-                        Log.d("onFailure", t.toString());
+                        t.printStackTrace();
+                        o.onError(t);
                     }
                 });
                 return Subscriptions.empty();
@@ -119,7 +124,8 @@ public class ApiManager {
 
                     @Override
                     public void onFailure(Throwable t) {
-                        Log.d("onFailure", "onFailure");
+                        t.printStackTrace();
+                        internalObserver.onError(t);
                     }
                 });
                 return Subscriptions.empty();

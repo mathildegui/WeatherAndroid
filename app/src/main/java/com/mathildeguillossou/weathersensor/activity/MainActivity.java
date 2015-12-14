@@ -2,13 +2,13 @@ package com.mathildeguillossou.weathersensor.activity;
 
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.mathildeguillossou.weathersensor.R;
 import com.mathildeguillossou.weathersensor.api.ApiManager;
@@ -25,6 +26,7 @@ import com.mathildeguillossou.weathersensor.fragment.ChartFragment;
 import com.mathildeguillossou.weathersensor.fragment.MainFragment;
 import com.mathildeguillossou.weathersensor.fragment.WeatherListFragment;
 import com.mathildeguillossou.weathersensor.fragment.dialog.DialogAddFragment;
+import com.mathildeguillossou.weathersensor.utils.Android;
 import com.mathildeguillossou.weathersensor.utils.Connection;
 import com.mathildeguillossou.weathersensor.utils.Date;
 
@@ -37,23 +39,27 @@ import rx.android.observables.AndroidObservable;
 import rx.concurrency.Schedulers;
 import rx.subscriptions.Subscriptions;
 
-public class MainActivity extends AppCompatActivity implements DialogAddFragment.DialogListener,
-        WeatherListFragment.OnListFragmentInteractionListener, Observer<Weather> {
+public class MainActivity extends AppCompatActivity implements
+        Observer<Weather>,
+        DialogAddFragment.DialogListener,
+        WeatherListFragment.OnListFragmentInteractionListener {
 
+    //Keep the last failed weather to retry in case the user wants
+    private Weather lastFailedW = null;
+
+    private boolean isConnected;
     private FragmentManager mFragmentManager;
     private Subscription mSubAdd = Subscriptions.empty();
 
     @Bind(R.id.toolbar) Toolbar mToolbar;
     @Bind(R.id.drawer_layout) DrawerLayout mDrawerLayout;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         //Require the ACCESS_NETWORK_STATE permission
-        boolean isConnected = Connection.checkActiveNetwork(getApplicationContext());
+        isConnected = Connection.checkActiveNetwork(getApplicationContext());
 
         mFragmentManager = getSupportFragmentManager();
 
@@ -67,7 +73,13 @@ public class MainActivity extends AppCompatActivity implements DialogAddFragment
             });
         } else {
             setContentView(R.layout.activity_main);
-            setupFrag(savedInstanceState);
+            if(savedInstanceState == null) {
+                Android.loadFragment(mFragmentManager,
+                        MainFragment.class,
+                        R.id.content_frame,
+                        mFragmentManager.findFragmentById(R.id.content_frame) != null,
+                        true);
+            }
             setupFloatingButton();
         }
         initApp();
@@ -88,6 +100,10 @@ public class MainActivity extends AppCompatActivity implements DialogAddFragment
 
     private void setDrawerContent() {
         NavigationView navigationView = (NavigationView) findViewById(R.id.nvView);
+        if(!isConnected) {
+            navigationView.getMenu().findItem(R.id.nav_list_fragment).setEnabled(false);
+            navigationView.getMenu().findItem(R.id.nav_chart_fragment).setEnabled(false);
+        }
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
@@ -103,7 +119,6 @@ public class MainActivity extends AppCompatActivity implements DialogAddFragment
     }
 
     private void selectDrawerItem(MenuItem item) {
-        Fragment f = null;
         Class fragClas;
 
         switch (item.getItemId()) {
@@ -116,42 +131,26 @@ public class MainActivity extends AppCompatActivity implements DialogAddFragment
             default:
                 fragClas = MainFragment.class;
         }
+        Android.loadFragment(mFragmentManager,
+                fragClas,
+                R.id.content_frame,
+                mFragmentManager.findFragmentById(R.id.content_frame) != null,
+                false);
 
-        try {
-            f = (Fragment) fragClas.newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        mFragmentManager
-                .beginTransaction()
-                .replace(R.id.content_frame, f)
-                .commit();
+        if(!isConnected && findViewById(R.id.not_found) != null)
+            findViewById(R.id.not_found).setVisibility(View.GONE);
 
         item.setChecked(true);
         setTitle(item.getTitle());
         mDrawerLayout.closeDrawers();
     }
 
-    private void setupFrag(Bundle b) {
-        if(b == null) {
-            mFragmentManager
-                    .beginTransaction()
-                    .addToBackStack(MainFragment.class.getSimpleName())
-                    .add(R.id.content_frame, new MainFragment())
-                    .commit();
-        }
-    }
-
     private void setupFloatingButton() {
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 DialogFragment newFragment = new DialogAddFragment();
                 newFragment.show(getSupportFragmentManager(), "Add value");
-                /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();*/
             }
         });
     }
@@ -191,13 +190,12 @@ public class MainActivity extends AppCompatActivity implements DialogAddFragment
     }
 
     @Override
-    public void onListFragmentInteraction(Weather item) {
-        Log.d("onFragment Interaction", "from the act");
+    public void onDialogPositiveClick(Float humidity, Float temperature) {
+        lastFailedW = new Weather(humidity, temperature);
+        subscribe(lastFailedW);
     }
 
-    @Override
-    public void onDialogPositiveClick(Float humidity, Float temperature) {
-        Weather w = new Weather(humidity, temperature);
+    private void subscribe(Weather w) {
         mSubAdd =
                 AndroidObservable
                         .fromActivity(MainActivity.this, ApiManager.addW(w))
@@ -218,11 +216,30 @@ public class MainActivity extends AppCompatActivity implements DialogAddFragment
 
     @Override
     public void onError(Throwable e) {
-        Log.d("on", "erro");
+         Snackbar sb = Snackbar.make(findViewById(R.id.coord_layout), "Une erreur est survenue", Snackbar.LENGTH_LONG)
+                .setAction("Réessayer", new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        subscribe(lastFailedW);
+                    }
+                }).setActionTextColor(Color.RED);
+        View sbView = sb.getView();
+        TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+        textView.setTextColor(Color.YELLOW);
+        sb.show();
     }
 
     @Override
-    public void onNext(Weather args) {
-        Log.d("on", "next");
+    public void onNext(Weather w) {
+        lastFailedW = null;
+        MainFragment f = (MainFragment) getSupportFragmentManager().
+                findFragmentById(R.id.content_frame);
+        f.updateFields(w.temperature, w.humidity);
+    }
+
+    @Override
+    public void onListFragmentInteraction(Weather item) {
+
     }
 }
