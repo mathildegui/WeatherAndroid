@@ -25,6 +25,8 @@ public class DialogAddFragment extends DialogFragment {
     @Bind(R.id.add_hum_et) EditText mHumidityEt;
     @Bind(R.id.add_temp_et) EditText mTempidityEt;
 
+    private DialogListener mListener;
+
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -63,9 +65,6 @@ public class DialogAddFragment extends DialogFragment {
         void onDialogPositiveClick(Float humidity, Float temperature);
         void onDialogNegativeClick(DialogFragment dialog);
     }
-
-    // Use this instance of the interface to deliver action events
-    DialogListener mListener;
 
     // Override the Fragment.onAttach() method to instantiate the NoticeDialogListener
     @Override

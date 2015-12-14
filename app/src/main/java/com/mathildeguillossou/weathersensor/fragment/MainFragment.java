@@ -3,7 +3,10 @@ package com.mathildeguillossou.weathersensor.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -11,10 +14,7 @@ import android.widget.TextView;
 import com.mathildeguillossou.weathersensor.R;
 import com.mathildeguillossou.weathersensor.api.ApiManager;
 import com.mathildeguillossou.weathersensor.bean.Weather;
-import com.mathildeguillossou.weathersensor.utils.*;
 import com.mathildeguillossou.weathersensor.utils.Number;
-
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -33,6 +33,9 @@ public class MainFragment extends Fragment implements Observer<Weather> {
     @Bind(R.id.currentTemp) TextView mCurrentTemp;
     @Bind(R.id.currentHumidity) TextView mCurrentHumidity;
 
+    @Bind(R.id.swipeContainer) SwipeRefreshLayout swipeContainer;
+
+
     private Weather mWeather;
     private Subscription mSubsGetLast = Subscriptions.empty();
 
@@ -47,22 +50,48 @@ public class MainFragment extends Fragment implements Observer<Weather> {
 
         ButterKnife.bind(this, v);
 
-        /**
-         * FIXME load only the last value and not the entire list of data
-         */
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                subscribe();
+            }
+        });
+        swipeContainer.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
+
+        subscribe();
+        return v;
+    }
+
+    private void subscribe() {
         mSubsGetLast =
                 AndroidObservable
                         .fromFragment(this, ApiManager.getLast())
                         .observeOn(Schedulers.threadPoolForIO())
                         .subscribeOn(AndroidSchedulers.mainThread())
                         .subscribe(this);
-        return v;
+    }
+
+    private void unsubscribe() {
+        mSubsGetLast.unsubscribe();
     }
 
     @Override
     public void onDestroy() {
-        mSubsGetLast.unsubscribe();
+        unsubscribe();
         super.onDestroy();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        //Because after swipe, when click on the left menu,
+        // this fragment remain and the other is above
+        if (swipeContainer!=null) {
+            swipeContainer.setRefreshing(false);
+            swipeContainer.destroyDrawingCache();
+            swipeContainer.clearAnimation();
+        }
+        unsubscribe();
     }
 
     @Override
@@ -98,6 +127,7 @@ public class MainFragment extends Fragment implements Observer<Weather> {
                             String.valueOf(mWeather.humidity):
                             String.format("%.2f", mWeather.humidity);
                     mCurrentHumidity.setText(h);
+                    swipeContainer.setRefreshing(false);
                 }
             });
         }

@@ -26,8 +26,7 @@ import com.mathildeguillossou.weathersensor.fragment.MainFragment;
 import com.mathildeguillossou.weathersensor.fragment.WeatherListFragment;
 import com.mathildeguillossou.weathersensor.fragment.dialog.DialogAddFragment;
 import com.mathildeguillossou.weathersensor.utils.Connection;
-
-import java.util.Calendar;
+import com.mathildeguillossou.weathersensor.utils.Date;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -42,23 +41,16 @@ public class MainActivity extends AppCompatActivity implements DialogAddFragment
         WeatherListFragment.OnListFragmentInteractionListener, Observer<Weather> {
 
     private FragmentManager mFragmentManager;
+    private Subscription mSubAdd = Subscriptions.empty();
 
     @Bind(R.id.toolbar) Toolbar mToolbar;
     @Bind(R.id.drawer_layout) DrawerLayout mDrawerLayout;
 
-    private final static String DAY, DAWN, NIGHT, EVENING;
 
-    static {
-        DAY     = "day";
-        DAWN    = "dawn";
-        NIGHT   = "night";
-        EVENING = "evening";
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 
         //Require the ACCESS_NETWORK_STATE permission
         boolean isConnected = Connection.checkActiveNetwork(getApplicationContext());
@@ -67,7 +59,6 @@ public class MainActivity extends AppCompatActivity implements DialogAddFragment
 
         if(!isConnected) {
             setContentView(R.layout.no_network);
-            //Toast.makeText(this, Connection.getErrorMessage(), Toast.LENGTH_SHORT).show();
             findViewById(R.id.not_found).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -76,11 +67,16 @@ public class MainActivity extends AppCompatActivity implements DialogAddFragment
             });
         } else {
             setContentView(R.layout.activity_main);
-
             setupFrag(savedInstanceState);
             setupFloatingButton();
         }
         initApp();
+    }
+
+    @Override
+    public void onDestroy() {
+        mSubAdd.unsubscribe();
+        super.onDestroy();
     }
 
     private void initApp() {
@@ -101,30 +97,9 @@ public class MainActivity extends AppCompatActivity implements DialogAddFragment
         });
 
         ImageView ivHeader = (ImageView)navigationView.getHeaderView(0).findViewById(R.id.nav_header);
-        int resourceId = getResources().getIdentifier("rockymontains_" + getTime(), "drawable", getPackageName());
+        int resourceId = getResources().getIdentifier("rockymontains_" + Date.getTime(), "drawable", getPackageName());
 
         ivHeader.setBackgroundResource(resourceId);
-    }
-
-    /**
-     * Return the moment of the day
-     * Possible values: NIGHT - DAWN - DAY - EVENING
-     * @return Moment of the day
-     */
-    private String getTime() {
-        Calendar c = Calendar.getInstance();
-        int hour = c.get(Calendar.HOUR_OF_DAY);
-
-        if(hour >= 22 || hour < 4) {
-            return NIGHT;
-        } else if (hour >= 4 && hour < 10) {
-            return DAWN;
-        } else if (hour >= 10 && hour < 16) {
-            return DAY;
-        } else if (hour >= 16 && hour < 22) {
-            return EVENING;
-        }
-        return DAY;
     }
 
     private void selectDrawerItem(MenuItem item) {
@@ -167,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements DialogAddFragment
                     .commit();
         }
     }
-    private Subscription mSubAdd = Subscriptions.empty();
+
     private void setupFloatingButton() {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -190,13 +165,11 @@ public class MainActivity extends AppCompatActivity implements DialogAddFragment
                 R.string.drawer_close) {
             public void onDrawerClosed(View view) {
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-                Log.d("on Drawer", "closed");
             }
 
             public void onDrawerOpened(View drawerView) {
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
                 mDrawerLayout.bringToFront();
-                Log.d("on Drawer", "opened");
             }
 
             public void onDrawerSlide(View drawerView, float slideOffset) {
