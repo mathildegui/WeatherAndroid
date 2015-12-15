@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentManager;
  * @author Mathilde Guillossou
  */
 public class Android {
-    public static void loadFragment(FragmentManager fm, Class c, int id, boolean replace, boolean addToStack) {
+    public static Fragment loadFragment(FragmentManager fm, Class c, int id, boolean replace, boolean addToStack) {
         Fragment f = null;
         try {
             f = (Fragment) c.newInstance();
@@ -20,5 +20,6 @@ public class Android {
             if(addToStack) fm.beginTransaction().addToBackStack(c.getSimpleName()).add(id, f).commit();
             else fm.beginTransaction().add(id, f).commit();
         }
+        return f;
     }
 }

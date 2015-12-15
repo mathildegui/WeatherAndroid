@@ -82,4 +82,11 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="pref_color_summary">Couleur de la barre de navigation et la bar de status</string>
+    <string name="pref_color_title">Changer la couleur</string>
+    <string name="pref_temp_title">Temperature</string>
+    <string name="pref_temp_summary">Display temperature values</string>
+    <string name="pref_hum_title">Humidity</string>
+    <string name="pref_hum_summary">Display humidity values</string>
+    <string name="language">Langue</string>
 </resources>

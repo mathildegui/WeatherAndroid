@@ -1,11 +1,11 @@
 package com.mathildeguillossou.weathersensor.activity;
 
-
 import android.content.Intent;
 import android.graphics.Color;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
@@ -13,10 +13,12 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mathildeguillossou.weathersensor.R;
 import com.mathildeguillossou.weathersensor.api.ApiManager;
@@ -25,6 +27,7 @@ import com.mathildeguillossou.weathersensor.fragment.ChartFragment;
 import com.mathildeguillossou.weathersensor.fragment.MainFragment;
 import com.mathildeguillossou.weathersensor.fragment.SettingsFragment;
 import com.mathildeguillossou.weathersensor.fragment.WeatherListFragment;
+import com.mathildeguillossou.weathersensor.fragment.dialog.ColorPickerDialogFragment;
 import com.mathildeguillossou.weathersensor.fragment.dialog.DialogAddFragment;
 import com.mathildeguillossou.weathersensor.utils.Android;
 import com.mathildeguillossou.weathersensor.utils.Connection;
@@ -40,6 +43,8 @@ import rx.concurrency.Schedulers;
 import rx.subscriptions.Subscriptions;
 
 public class MainActivity extends AppCompatActivity implements
+        ColorPickerDialogFragment.ColorPickerDialogListener,
+        SettingsFragment.ColorNotEnableListener,
         Observer<Weather>,
         DialogAddFragment.DialogListener,
         WeatherListFragment.OnListFragmentInteractionListener {
@@ -57,6 +62,8 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mPreferenceFragment = new SettingsFragment();
 
         //Require the ACCESS_NETWORK_STATE permission
         isConnected = Connection.checkActiveNetwork(getApplicationContext());
@@ -134,11 +141,15 @@ public class MainActivity extends AppCompatActivity implements
             default:
                 fragClas = MainFragment.class;
         }
-        Android.loadFragment(mFragmentManager,
+        Fragment f = Android.loadFragment(mFragmentManager,
                 fragClas,
                 R.id.content_frame,
                 mFragmentManager.findFragmentById(R.id.content_frame) != null,
                 false);
+
+        if(f instanceof SettingsFragment) {
+            mPreferenceFragment = (SettingsFragment)f;
+        }
 
         if(!isConnected && findViewById(R.id.not_found) != null)
             findViewById(R.id.not_found).setVisibility(View.GONE);
@@ -243,5 +254,28 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onListFragmentInteraction(Weather item) {
 
+    }
+
+    private SettingsFragment mPreferenceFragment;
+
+    @Override
+    public void onColorSelected(int dialogId, int color) {
+        mPreferenceFragment
+                .onColorSelected(dialogId, color);
+    }
+
+    @Override
+    public void onDialogDismissed(int dialogId) {
+
+    }
+
+    @Override
+    public void onColorSelected(int androidVersion) {
+        Toast.makeText(this,
+                "Sorry, your current version is "
+                + androidVersion
+                + ". You should upgrade your system to have access to this function",
+                Toast.LENGTH_LONG)
+                .show();
     }
 }

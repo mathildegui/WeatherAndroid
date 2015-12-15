@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pref_language_entries">
+        <item>French</item>
+        <item>English</item>
+    </string-array>
+    <string-array name="pref_language_alias_entries">
+        <item>"en-US"</item>
+        <item>"fr-FR"</item>
+    </string-array>
+</resources>

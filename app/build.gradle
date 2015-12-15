@@ -40,4 +40,5 @@ dependencies {
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.github.PhilJay:MPAndroidChart:v2.1.6'
     compile 'com.github.nirhart:parallaxscroll:1.0'
+    compile "com.github.danielnilsson9:color-picker-view:1.4.0@aar"
 }
