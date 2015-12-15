@@ -6,7 +6,7 @@ import android.net.NetworkInfo;
 
 
 /**
- * Created by mathildeguillossou on 12/12/15.
+ * @author Mathilde Guillossou
  */
 public class Connection {
 

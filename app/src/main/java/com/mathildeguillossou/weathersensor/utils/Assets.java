@@ -13,13 +13,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * Created by mathildeguillossou on 13/12/15.
+ * @author Mathilde Guillossou
  */
 public class Assets {
     public final static String TAG = "Assets";
 
     public String loadJSONFromAsset(Context c) {
-        String json = null;
+        String json;
         try {
             InputStream is = c.getAssets().open("yourfilename.json");
             int size = is.available();
@@ -49,7 +49,7 @@ public class Assets {
                 String url_value = jo_inside.getString("url");
 
                 //Add your values in your `ArrayList` as below:
-                m_li = new HashMap<String, String>();
+                m_li = new HashMap<>();
                 m_li.put("formule", formula_value);
                 m_li.put("url", url_value);
 

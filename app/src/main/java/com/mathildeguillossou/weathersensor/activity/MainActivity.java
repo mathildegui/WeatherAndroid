@@ -13,7 +13,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -24,6 +23,7 @@ import com.mathildeguillossou.weathersensor.api.ApiManager;
 import com.mathildeguillossou.weathersensor.bean.Weather;
 import com.mathildeguillossou.weathersensor.fragment.ChartFragment;
 import com.mathildeguillossou.weathersensor.fragment.MainFragment;
+import com.mathildeguillossou.weathersensor.fragment.SettingsFragment;
 import com.mathildeguillossou.weathersensor.fragment.WeatherListFragment;
 import com.mathildeguillossou.weathersensor.fragment.dialog.DialogAddFragment;
 import com.mathildeguillossou.weathersensor.utils.Android;
@@ -128,6 +128,9 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.nav_list_fragment:
                 fragClas = WeatherListFragment.class;
                 break;
+            case R.id.nav_settings_fragment:
+                fragClas = SettingsFragment.class;
+                break;
             default:
                 fragClas = MainFragment.class;
         }
@@ -211,14 +214,13 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onCompleted() {
-        Log.d("on", "completed");
+
     }
 
     @Override
     public void onError(Throwable e) {
-         Snackbar sb = Snackbar.make(findViewById(R.id.coord_layout), "Une erreur est survenue", Snackbar.LENGTH_LONG)
-                .setAction("Réessayer", new View.OnClickListener() {
-
+         Snackbar sb = Snackbar.make(findViewById(R.id.coord_layout), R.string.smt_wrong_happened, Snackbar.LENGTH_LONG)
+                .setAction(R.string.tryagain, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         subscribe(lastFailedW);

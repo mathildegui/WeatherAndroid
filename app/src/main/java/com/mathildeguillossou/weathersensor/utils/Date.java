@@ -3,11 +3,9 @@ package com.mathildeguillossou.weathersensor.utils;
 import java.util.Calendar;
 
 /**
- * Created by mathildeguillossou on 14/12/15.
+ * @author Mathilde Guillossou
  */
 public class Date {
-    public final static String TAG = "Date";
-
     public final static String DAY, DAWN, NIGHT, EVENING;
 
     static {

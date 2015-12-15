@@ -19,7 +19,8 @@ import rx.concurrency.Schedulers;
 import rx.subscriptions.Subscriptions;
 
 /**
- * Created by mathildeguillossou on 03/12/15.
+ * @author Mathilde Guillossou
+ * @since 03/12/15
  */
 public class ApiManager {
     public final static String TAG     = "ApiManager";
