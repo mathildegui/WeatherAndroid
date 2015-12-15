@@ -3,33 +3,51 @@ package com.mathildeguillossou.weathersensor.fragment;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.preference.Preference;
+import android.preference.PreferenceManager;
+import android.preference.SwitchPreference;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.widget.Switch;
 
 import com.github.danielnilsson9.colorpickerview.preference.ColorPreference;
 import com.mathildeguillossou.weathersensor.R;
 import com.mathildeguillossou.weathersensor.fragment.dialog.ColorPickerDialogFragment;
+import com.mathildeguillossou.weathersensor.utils.Constant;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class SettingsFragment extends PreferenceFragment implements
-        ColorPickerDialogFragment.ColorPickerDialogListener {
+        ColorPickerDialogFragment.ColorPickerDialogListener,
+        SharedPreferences.OnSharedPreferenceChangeListener {
 
     public static final int PREFERENCE_DIALOG_ID = 1250;
 
     public SettingsFragment() {
 
     }
-    private ColorPreference mPref;
+    private ColorPreference mPrefColor;
+    private SwitchPreference mPrefSwitchHum;
+    private SwitchPreference mPrefSwitchTemp;
+    private EditTextPreference mPrefEditTextUri;
+
     private ColorNotEnableListener mListener;
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        Log.d("onSharedPreferenceChanged", "onSharedPreferenceChanged");
+    }
+
     public interface ColorNotEnableListener {
         void onColorSelected(int androidVersion);
     }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -47,10 +65,27 @@ public class SettingsFragment extends PreferenceFragment implements
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
 
-        mPref = (ColorPreference) findPreference("pref_sync_color");
+        PreferenceManager.getDefaultSharedPreferences(
+                this.getContext()).registerOnSharedPreferenceChangeListener(this);
+
+        mPrefColor       = (ColorPreference) findPreference("pref_sync_color");
+        mPrefSwitchHum   = (SwitchPreference) findPreference("pref_sync_hum");
+        mPrefSwitchTemp  = (SwitchPreference) findPreference("pref_sync_temp");
+        mPrefEditTextUri = (EditTextPreference) findPreference("pref_sync_uri");
+
+        mPrefEditTextUri.setText(Constant.URI_MONTROUGE);
+        mPrefEditTextUri.setSummary(Constant.URI_MONTROUGE);
+        
+        mPrefEditTextUri.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                mPrefEditTextUri.setSummary(newValue.toString());
+                return false;
+            }
+        });
+
         if(android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            //mPref.setSelectable(false);
-            mPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            mPrefColor.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
                     mListener.onColorSelected(Build.VERSION.SDK_INT);
@@ -58,7 +93,7 @@ public class SettingsFragment extends PreferenceFragment implements
                 }
             });
         } else {
-            mPref.setOnShowDialogListener(new ColorPreference.OnShowDialogListener() {
+            mPrefColor.setOnShowDialogListener(new ColorPreference.OnShowDialogListener() {
                 @Override
                 public void onShowColorPickerDialog(String title, int currentColor) {
                     ColorPickerDialogFragment dialogFragment =
@@ -81,7 +116,7 @@ public class SettingsFragment extends PreferenceFragment implements
             case PREFERENCE_DIALOG_ID:
                 getActivity().getWindow().setStatusBarColor(color);
                 getActivity().getWindow().setNavigationBarColor(color);
-                mPref.saveValue(color);
+                mPrefColor.saveValue(color);
                 break;
         }
     }

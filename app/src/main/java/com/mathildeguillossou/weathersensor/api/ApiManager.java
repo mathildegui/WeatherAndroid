@@ -1,6 +1,7 @@
 package com.mathildeguillossou.weathersensor.api;
 
 import com.mathildeguillossou.weathersensor.bean.Weather;
+import com.mathildeguillossou.weathersensor.utils.Constant;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class ApiManager {
     public final static String TAG     = "ApiManager";
     //FIXME change to ip box (currently not working on BBox)
     //public static final String API_URL = "http://192.168.1.30:3000/";
-    public static final String API_URL = "http://81.220.90.238:3000/";
+    public static final String API_URL = Constant.URI_MONTROUGE;
 
     static Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(API_URL)

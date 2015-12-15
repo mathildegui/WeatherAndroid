@@ -21,11 +21,12 @@
     <string name="cancel">cancel</string>
     <string name="tryagain">Retry</string>
     <string name="smt_wrong_happened">Something wrong happened</string>
-    <string name="pref_color_summary">Couleur de la barre de navigation et la bar de status</string>
-    <string name="pref_color_title">Changer la couleur</string>
+    <string name="pref_color_summary">Color of the navigation and status bar</string>
+    <string name="pref_color_title">Color</string>
     <string name="pref_temp_title">Temperature</string>
     <string name="pref_temp_summary">Display temperature values</string>
     <string name="pref_hum_title">Humidity</string>
     <string name="pref_hum_summary">Display humidity values</string>
-    <string name="language">Langue</string>
+    <string name="language">Language</string>
+    <string name="pref_uri_dialog_message">Here the link to get data</string>
 </resources>

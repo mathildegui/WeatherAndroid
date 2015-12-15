@@ -21,4 +21,10 @@
         android:defaultValue="@color/colorPrimaryDark"
         android:summary="@string/pref_color_summary"
         android:title="@string/pref_color_title" />
+    <EditTextPreference
+        android:key="pref_sync_uri"
+        android:title="@string/pref_uri_title"
+        android:dialogTitle="@string/pref_uri_title"
+        android:dialogMessage="@string/pref_uri_dialog_message"
+        />
 </PreferenceScreen>
